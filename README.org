@@ -1,0 +1,3 @@
+this is primarily to follow along with the [[https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/sudoku][Piston Sudoku tutorial]], but will
+eventually become my own sudoku program with the features from that used by
+[[https://www.youtube.com/c/CrackingTheCryptic][Cracking the Cryptic]]
