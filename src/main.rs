@@ -30,7 +30,7 @@ fn main() {
     let mut events = Events::new(EventSettings::new().lazy(true));
     let mut gl = GlGraphics::new(opengl);
 
-    let gameboard = Gameboard::new();
+    let gameboard = Gameboard::load_sdm("puzzles/puzzle.sdm");
     let mut gameboard_controller = GameboardController::new(gameboard);
     let gameboard_view_settings = GameboardViewSettings::new();
     let gameboard_view = GameboardView::new(gameboard_view_settings);
