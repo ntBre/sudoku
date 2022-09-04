@@ -3,7 +3,9 @@
 //! A Sudoku game.
 
 use glutin_window::GlutinWindow;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::{
+    Filter, GlGraphics, GlyphCache, OpenGL, TextureSettings,
+};
 use piston::event_loop::{EventSettings, Events};
 use piston::{EventLoop, RenderEvent, WindowSettings};
 
@@ -14,6 +16,8 @@ pub use crate::gameboard_view::{GameboardView, GameboardViewSettings};
 mod gameboard;
 mod gameboard_controller;
 mod gameboard_view;
+
+static FONT: &str = "/usr/share/fonts/TTF/DejaVuSans.ttf";
 
 fn main() {
     let opengl = OpenGL::V3_2;
@@ -31,6 +35,10 @@ fn main() {
     let gameboard_view_settings = GameboardViewSettings::new();
     let gameboard_view = GameboardView::new(gameboard_view_settings);
 
+    let texture_settings = TextureSettings::new().filter(Filter::Nearest);
+    let ref mut glyphs = GlyphCache::new(FONT, (), texture_settings)
+        .expect(&format!("failed to load font `{}`", FONT));
+
     while let Some(e) = events.next(&mut window) {
         gameboard_controller.event(
             gameboard_view.settings.position,
@@ -42,7 +50,7 @@ fn main() {
                 use graphics::clear;
 
                 clear([1.0; 4], g);
-                gameboard_view.draw(&gameboard_controller, &c, g);
+                gameboard_view.draw(&gameboard_controller, glyphs, &c, g);
             });
         }
     }
