@@ -30,7 +30,10 @@ fn main() {
     let mut events = Events::new(EventSettings::new().lazy(true));
     let mut gl = GlGraphics::new(opengl);
 
-    let gameboard = Gameboard::load_sdm("puzzles/puzzle.sdm");
+    let args: Vec<_> = std::env::args().collect();
+    let infile = args.get(1).expect("usage: sudoku SDM_FILE");
+
+    let gameboard = Gameboard::load_sdm(infile);
     let mut gameboard_controller = GameboardController::new(gameboard);
     let gameboard_view_settings = GameboardViewSettings::new();
     let gameboard_view = GameboardView::new(gameboard_view_settings);

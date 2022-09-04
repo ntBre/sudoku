@@ -16,9 +16,10 @@ pub struct Cell {
 /// Stores game board information.
 #[derive(Debug, PartialEq)]
 pub struct Gameboard {
-    /// Stores the content of the cells.
-    /// `0` is an empty cell.
+    /// Stores the content of the cells. `0` is an empty cell.
     pub cells: [[Cell; SIZE]; SIZE],
+    /// Whether or not the puzzle is completed
+    pub completed: bool,
 }
 
 impl Gameboard {
@@ -26,6 +27,7 @@ impl Gameboard {
     pub fn new() -> Gameboard {
         Gameboard {
             cells: [[Cell::default(); SIZE]; SIZE],
+            completed: false,
         }
     }
 
@@ -48,7 +50,10 @@ impl Gameboard {
             };
             col += 1;
         }
-        Self { cells }
+        Self {
+            cells,
+            completed: false,
+        }
     }
 
     /// Gets the character at cell location.
@@ -73,6 +78,12 @@ impl Gameboard {
             self.validate(ind, val);
             self.cells[ind[1]][ind[0]].value = val;
         }
+        // check for puzzle completion
+        self.completed = self
+            .cells
+            .iter()
+            .flatten()
+            .all(|cell| !cell.invalid && cell.value != 0);
     }
 
     /// validate the `val` to be put into `ind`

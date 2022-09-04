@@ -35,6 +35,8 @@ pub struct GameboardViewSettings {
     pub invalid_cell_background_color: Color,
     /// Invalid selected cell background color.
     pub invalid_selected_cell_background_color: Color,
+    /// Completed game background color
+    pub completed_background_color: Color,
     /// Text color.
     pub text_color: Color,
 }
@@ -45,7 +47,7 @@ impl GameboardViewSettings {
         GameboardViewSettings {
             position: [10.0; 2],
             size: 400.0,
-	    // #ccccff
+            // #ccccff
             background_color: [0.8, 0.8, 1.0, 1.0],
             border_color: [0.0, 0.0, 0.2, 1.0],
             board_edge_color: [0.0, 0.0, 0.2, 1.0],
@@ -54,15 +56,17 @@ impl GameboardViewSettings {
             board_edge_radius: 3.0,
             section_edge_radius: 2.0,
             cell_edge_radius: 1.0,
-	    // #e5e5ff
+            // #e5e5ff
             selected_cell_background_color: [0.9, 0.9, 1.0, 1.0],
-	    // #ffffff
+            // #ffffff
             loaded_cell_background_color: [1.0, 1.0, 1.0, 1.0],
-	    // #ff0000
+            // #ff0000
             invalid_cell_background_color: [1.0, 0.0, 0.0, 1.0],
-	    // #ff0080
+            // #ff0080
             invalid_selected_cell_background_color: [1.0, 0.0, 0.5, 1.0],
-	    // #000019
+            // #ff0080
+            completed_background_color: [0.0, 1.0, 0.0, 1.0],
+            // #000019
             text_color: [0.0, 0.0, 0.1, 1.0],
         }
     }
@@ -101,50 +105,58 @@ impl GameboardView {
         ];
 
         // Draw board background.
-        Rectangle::new(settings.background_color).draw(
-            board_rect,
-            &c.draw_state,
-            c.transform,
-            g,
-        );
-
-        // Draw loaded and invalid cell backgrounds
-        for i in 0..9 {
-            for j in 0..9 {
-                if controller.gameboard.cells[i][j].loaded {
-                    color_cell(
-                        settings,
-                        [j, i],
-                        settings.loaded_cell_background_color,
-                        c,
-                        g,
-                    );
-                } else if controller.gameboard.cells[i][j].invalid {
-                    color_cell(
-                        settings,
-                        [j, i],
-                        settings.invalid_cell_background_color,
-                        c,
-                        g,
-                    );
+        if controller.gameboard.completed {
+            Rectangle::new(settings.completed_background_color).draw(
+                board_rect,
+                &c.draw_state,
+                c.transform,
+                g,
+            );
+        } else {
+            Rectangle::new(settings.background_color).draw(
+                board_rect,
+                &c.draw_state,
+                c.transform,
+                g,
+            );
+            // Draw loaded and invalid cell backgrounds
+            for i in 0..9 {
+                for j in 0..9 {
+                    if controller.gameboard.cells[i][j].loaded {
+                        color_cell(
+                            settings,
+                            [j, i],
+                            settings.loaded_cell_background_color,
+                            c,
+                            g,
+                        );
+                    } else if controller.gameboard.cells[i][j].invalid {
+                        color_cell(
+                            settings,
+                            [j, i],
+                            settings.invalid_cell_background_color,
+                            c,
+                            g,
+                        );
+                    }
                 }
             }
-        }
 
-        // Draw selected cell background.
-        if let Some(ind) = controller.selected_cell {
-            let cell = controller.gameboard.cells[ind[1]][ind[0]];
-            let color = if !cell.loaded {
-                if !cell.invalid {
-                    settings.selected_cell_background_color
+            // Draw selected cell background.
+            if let Some(ind) = controller.selected_cell {
+                let cell = controller.gameboard.cells[ind[1]][ind[0]];
+                let color = if !cell.loaded {
+                    if !cell.invalid {
+                        settings.selected_cell_background_color
+                    } else {
+                        settings.invalid_selected_cell_background_color
+                    }
                 } else {
-                    settings.invalid_selected_cell_background_color
-                }
-            } else {
-                settings.loaded_cell_background_color
+                    settings.loaded_cell_background_color
+                };
+                color_cell(settings, ind, color, c, g);
             };
-            color_cell(settings, ind, color, c, g);
-        };
+        }
 
         // Draw characters.
         let text_image = Image::new_color(settings.text_color);
